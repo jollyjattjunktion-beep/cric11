@@ -34,6 +34,10 @@ The normalized ingestion payload requires `title`, `team1` and `team2`. Optional
 
 Run tests with `pip install -r requirements-dev.txt` followed by `pytest`.
 
+
+### CREX permissions and source rights
+CREX's published Terms of Use state that platform materials are protected, prohibit copying/reproducing/distributing materials without prior written permission, and grant users a limited personal, non-commercial access licence. The terms also prohibit scraping or extracting personal data. Do not build a commercial automated content-copying pipeline from CREX without written authorization and any required data licence. Prefer a licensed cricket-data API/feed for production scorecards, ball events and commentary. See https://crex.com/terms-and-conditions.
+
 ## Production next steps
 Add a durable background worker, provider rate-limit handling, retries, database migrations, audit logs and monitoring. Configure refresh intervals to match the data provider's terms and limits. Live synchronization is not enabled.
 
