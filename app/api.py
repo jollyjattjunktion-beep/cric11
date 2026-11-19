@@ -108,14 +108,10 @@ def match_scorecard(slug: str, db: Session = Depends(db_session)):
     return {"data": result}
 
 @router.get("/matches/{slug}/commentary")
-def match_commentary(slug: str, style: str = Query("original", pattern="^(original|source)$"),
-                     limit: int = Query(100, ge=1, le=500), db: Session = Depends(db_session)):
+def match_commentary(slug: str, limit: int = Query(100, ge=1, le=500),
+                     db: Session = Depends(db_session)):
+    """Return newly authored event-based English copy, not copied provider prose."""
     m = _match_or_404(db, slug)
-    if style == "source":
-        rows = db.scalars(select(CommentaryEntry).where(CommentaryEntry.match_id == m.id)
-                          .order_by(CommentaryEntry.id.desc()).limit(limit)).all()
-        return {"data": [{"id": x.provider_entry_id, "innings": x.innings_number,
-                          "over": x.over_label, "text": x.text, "kind": "source"} for x in rows]}
     rows = db.scalars(select(BallEvent).where(BallEvent.match_id == m.id).order_by(
         BallEvent.innings_number.desc(), BallEvent.over_number.desc(), BallEvent.ball_number.desc()
     ).limit(limit)).all()
