@@ -53,7 +53,9 @@ class ImportJob(Base):
     message: Mapped[str] = mapped_column(Text, default="Awaiting an authorized provider adapter")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-from app import cricket_data  # register normalized cricket tables before creating schema\n\nBase.metadata.create_all(engine)
+from app import cricket_data  # register normalized cricket tables before creating schema
+
+Base.metadata.create_all(engine)
 app = FastAPI(title=APP_NAME)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
