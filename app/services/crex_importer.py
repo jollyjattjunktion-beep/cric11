@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.main import Match
 from app.cricket_data import (
-    Team, Player, Innings, BattingScore, BowlingFigure, BallEvent,
+    Team, Player, MatchTeam, Innings, BattingScore, BowlingFigure, BallEvent,
     CommentaryEntry, PitchReport, ProviderMatch,
 )
 
@@ -110,13 +110,11 @@ def ingest_match_payload(db: Session, identity: SourceIdentity, payload: dict) -
 
     teams = {team1_name: _team(db, team1_name), team2_name: _team(db, team2_name)}
     for side, name in (("team1", team1_name), ("team2", team2_name)):
-        assoc = db.scalar(select(__import__("app.cricket_data", fromlist=["MatchTeam"]).MatchTeam).where(
-            __import__("app.cricket_data", fromlist=["MatchTeam"]).MatchTeam.match_id == match.id,
-            __import__("app.cricket_data", fromlist=["MatchTeam"]).MatchTeam.side == side
+        assoc = db.scalar(select(MatchTeam).where(
+            MatchTeam.match_id == match.id, MatchTeam.side == side
         ))
         if assoc is None:
-            MT = __import__("app.cricket_data", fromlist=["MatchTeam"]).MatchTeam
-            db.add(MT(match_id=match.id, team_id=teams[name].id, side=side))
+            db.add(MatchTeam(match_id=match.id, team_id=teams[name].id, side=side))
         else:
             assoc.team_id = teams[name].id
 
