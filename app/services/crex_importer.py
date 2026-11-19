@@ -58,6 +58,8 @@ def _player(db: Session, data: dict) -> Player:
         obj = db.scalar(select(Player).where(
             Player.provider == provider, Player.provider_player_id == provider_id
         ))
+    else:
+        obj = db.scalar(select(Player).where(Player.provider == provider, Player.name == name))
     if obj is None:
         obj = Player(name=name, provider=provider, provider_player_id=provider_id)
         db.add(obj)
