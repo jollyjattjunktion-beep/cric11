@@ -53,6 +53,8 @@ class ImportJob(Base):
     message: Mapped[str] = mapped_column(Text, default="Awaiting an authorized provider adapter")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
+from app import cricket_data  # register normalized cricket tables before creating schema
+
 Base.metadata.create_all(engine)
 app = FastAPI(title=APP_NAME)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -159,6 +161,9 @@ def sitemap(db: Session = Depends(db_session)):
     urls += [f"<url><loc>{BASE_URL}/match/{m.slug}</loc><lastmod>{m.created_at.date().isoformat()}</lastmod></url>" for m in matches]
     xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(urls) + "</urlset>"
     return Response(content=xml, media_type="application/xml")
+
+from app.api import router as api_router
+app.include_router(api_router)
 
 @app.get("/health")
 def health():
