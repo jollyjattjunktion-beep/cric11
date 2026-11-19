@@ -162,6 +162,9 @@ def sitemap(db: Session = Depends(db_session)):
     xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(urls) + "</urlset>"
     return Response(content=xml, media_type="application/xml")
 
+from app.api import router as api_router
+app.include_router(api_router)
+
 @app.get("/health")
 def health():
     return {"status": "ok", "app": APP_NAME}
