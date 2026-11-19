@@ -38,6 +38,18 @@ Run tests with `pip install -r requirements-dev.txt` followed by `pytest`.
 ### CREX permissions and source rights
 CREX's published Terms of Use state that platform materials are protected, prohibit copying/reproducing/distributing materials without prior written permission, and grant users a limited personal, non-commercial access licence. The terms also prohibit scraping or extracting personal data. Do not build a commercial automated content-copying pipeline from CREX without written authorization and any required data licence. Prefer a licensed cricket-data API/feed for production scorecards, ball events and commentary. See https://crex.com/terms-and-conditions.
 
+
+## PreetSports REST API v1
+The read-only API is mounted under `/api/v1` and serves data stored in our own database:
+- `GET /api/v1/health`
+- `GET /api/v1/matches?status=Live&limit=30&offset=0`
+- `GET /api/v1/matches/{slug}`
+- `GET /api/v1/matches/{slug}/innings`
+- `GET /api/v1/matches/{slug}/scorecard`
+- `GET /api/v1/matches/{slug}/commentary`
+
+Interactive API documentation is available at `/docs` when the app is running. The commentary endpoint creates short original English lines from structured ball facts (runs, extras, wickets, over and player names). It does not paraphrase or expose provider commentary. Each ball position is the stable event key, so polling the endpoint does not create duplicate commentary records. Real-time updates still depend on a permitted data provider feeding new events into the database.
+
 ## Production next steps
 Add a durable background worker, provider rate-limit handling, retries, database migrations, audit logs and monitoring. Configure refresh intervals to match the data provider's terms and limits. Live synchronization is not enabled.
 
