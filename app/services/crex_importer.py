@@ -164,15 +164,23 @@ def ingest_match_payload(db: Session, identity: SourceIdentity, payload: dict) -
             BallEvent.over_number == int(event["over"]),
             BallEvent.ball_number == int(event["ball"]),
         ))
+        batter = _player(db, {"name": event["batter"], "provider": event.get("player_provider", "crex"),
+                                "provider_id": event.get("batter_id")}) if event.get("batter") else None
+        bowler = _player(db, {"name": event["bowler"], "provider": event.get("player_provider", "crex"),
+                                "provider_id": event.get("bowler_id")}) if event.get("bowler") else None
         if exists is None:
-            db.add(BallEvent(
+            exists = BallEvent(
                 match_id=match.id, innings_number=int(event["innings"]),
                 over_number=int(event["over"]), ball_number=int(event["ball"]),
-                runs_batter=int(event.get("runs_batter", 0)),
-                runs_extras=int(event.get("runs_extras", 0)),
-                wicket_kind=event.get("wicket_kind"), commentary=event.get("commentary"),
-                source_event_id=event.get("source_event_id"),
-            ))
+            )
+            db.add(exists)
+        exists.batter_id = batter.id if batter else exists.batter_id
+        exists.bowler_id = bowler.id if bowler else exists.bowler_id
+        exists.runs_batter = int(event.get("runs_batter", 0))
+        exists.runs_extras = int(event.get("runs_extras", 0))
+        exists.wicket_kind = event.get("wicket_kind")
+        exists.source_event_id = event.get("source_event_id")
+        # Provider prose is intentionally not used by the public original-commentary API.
 
     for entry in payload.get("commentary", []):
         entry_id = str(entry.get("id", "")).strip()
